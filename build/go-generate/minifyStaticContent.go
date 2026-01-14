@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	minify "github.com/tdewolff/minify/v2"
-	"github.com/tdewolff/minify/v2/css"
-	"github.com/tdewolff/minify/v2/js"
+	// minify "github.com/tdewolff/minify/v2"
+	// "github.com/tdewolff/minify/v2/css"
+	// "github.com/tdewolff/minify/v2/js"
 )
 
 const pathPrefix = "../../internal/webserver/web/static/"
@@ -25,7 +25,7 @@ type converter struct {
 
 func main() {
 	for _, f := range getPaths() {
-		minifyContent(f)
+		copyContent(f)
 	}
 }
 
@@ -86,25 +86,19 @@ func getPaths() []converter {
 	return result
 }
 
-func minifyContent(conv converter) {
-	m := minify.New()
-	m.AddFunc("text/css", css.Minify)
-	m.AddFunc("text/javascript", js.Minify)
+func copyContent(conv converter) {
+	files := getAllFiles(conv.InputPath)
 
-	files, err := m.Bytes(conv.Type, getAllFiles(conv.InputPath))
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(4)
-	}
-	err = os.WriteFile(conv.OutputPath, files, 0664)
+	err := os.WriteFile(conv.OutputPath, files, 0664)
 	if err != nil {
 		fmt.Println("Could not write " + conv.Name + " files")
 		fmt.Println(err)
 		os.Exit(5)
 	}
-	fmt.Println("Minified " + conv.Name)
+
+	fmt.Println("Copied " + conv.Name)
+
 	if conv.PreviousVersion != "" && fileExists(conv.PreviousVersion) {
-		fmt.Println("Removing old version of " + conv.Name)
 		err = os.Remove(conv.PreviousVersion)
 		if err != nil {
 			fmt.Println("Could not remove old " + conv.Name + " file")
@@ -113,6 +107,34 @@ func minifyContent(conv converter) {
 		}
 	}
 }
+
+// func minifyContent(conv converter) {
+// 	m := minify.New()
+// 	m.AddFunc("text/css", css.Minify)
+// 	m.AddFunc("text/javascript", js.Minify)
+
+// 	files, err := m.Bytes(conv.Type, getAllFiles(conv.InputPath))
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		os.Exit(4)
+// 	}
+// 	err = os.WriteFile(conv.OutputPath, files, 0664)
+// 	if err != nil {
+// 		fmt.Println("Could not write " + conv.Name + " files")
+// 		fmt.Println(err)
+// 		os.Exit(5)
+// 	}
+// 	fmt.Println("Minified " + conv.Name)
+// 	if conv.PreviousVersion != "" && fileExists(conv.PreviousVersion) {
+// 		fmt.Println("Removing old version of " + conv.Name)
+// 		err = os.Remove(conv.PreviousVersion)
+// 		if err != nil {
+// 			fmt.Println("Could not remove old " + conv.Name + " file")
+// 			fmt.Println(err)
+// 			os.Exit(6)
+// 		}
+// 	}
+// }
 
 func getAllFiles(pattern string) []byte {
 	var result, content []byte

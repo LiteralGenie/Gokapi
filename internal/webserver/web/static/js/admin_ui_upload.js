@@ -17,25 +17,25 @@ function initDropzone() {
         paramName: "file",
         dictDefaultMessage: "Drop files, paste or click here to upload",
         createImageThumbnails: false,
-        chunksUploaded: function(file, done) {
+        chunksUploaded: function (file, done) {
             sendChunkComplete(file, done);
         },
-        init: function() {
+        init: function () {
             dropzoneObject = this;
             this.on("addedfile", file => {
                 file.upload.uuid = getUuid();
                 saveUploadDefaults();
                 addFileProgress(file);
             });
-            this.on("queuecomplete", function() {
+            this.on("queuecomplete", function () {
                 isUploading = false;
             });
-            this.on("sending", function(file, xhr, formData) {
+            this.on("sending", function (file, xhr, formData) {
                 isUploading = true;
             });
 
             // Error handling for chunk upload, especially returning 413 error code (invalid nginx configuration)
-            this.on("error", function(file, errorMessage, xhr) {
+            this.on("error", function (file, errorMessage, xhr) {
                 if (xhr && xhr.status === 413) {
                     showError(file, "File too large to upload. If you are using a reverse proxy, make sure that the allowed body size is at least 70MB.");
                 } else {
@@ -43,7 +43,7 @@ function initDropzone() {
                 }
             });
 
-            this.on("uploadprogress", function(file, progress, bytesSent) {
+            this.on("uploadprogress", function (file, progress, bytesSent) {
                 updateProgressbar(file, progress, bytesSent);
             });
 
@@ -58,14 +58,14 @@ function initDropzone() {
     };
 
 
-    document.onpaste = function(event) {
+    document.onpaste = function (event) {
         if (dropzoneObject.disabled) {
             return;
         }
         const activeElement = document.activeElement;
         // disable upload on paste if edit field with data-allow-regular-paste is selected or the calendar view (with placeholder attribute)
-        if (activeElement && (activeElement.hasAttribute('data-allow-regular-paste') ||activeElement.hasAttribute('placeholder'))) {
-	    return;
+        if (activeElement && (activeElement.hasAttribute('data-allow-regular-paste') || activeElement.hasAttribute('placeholder'))) {
+            return;
         }
 
         var items = (event.clipboardData || event.originalEvent.clipboardData).items;
@@ -75,7 +75,7 @@ function initDropzone() {
                 dropzoneObject.addFile(item.getAsFile());
             }
             if (item.kind === 'string') {
-                item.getAsString(function(s) {
+                item.getAsString(function (s) {
                     // If a picture was copied from a website, the origin information might be submitted, which is filtered with this regex out
                     const pattern = /<img *.+>/gi;
                     if (pattern.test(s) === false) {
@@ -419,7 +419,7 @@ function handleEditCheckboxChange(checkbox) {
 function showEditModal(filename, id, downloads, expiry, password, unlimitedown, unlimitedtime, isE2e, canReplace) {
     // Cloning removes any previous values or form validation
     let originalModal = $('#modaledit').clone();
-    $("#modaledit").on('hide.bs.modal', function() {
+    $("#modaledit").on('hide.bs.modal', function () {
         $('#modaledit').remove();
         let myClone = originalModal.clone();
         $('body').append(myClone);
@@ -671,56 +671,66 @@ function addRow(item) {
     item.Id = sanitizeId(item.Id);
     row.id = "row-" + item.Id;
     let cellFilename = row.insertCell(0);
-    let cellFileSize = row.insertCell(1);
-    let cellRemainingDownloads = row.insertCell(2);
-    let cellStoredUntil = row.insertCell(3);
-    let cellDownloadCount = row.insertCell(4);
-    let cellUrl = row.insertCell(5);
-    let cellButtons = row.insertCell(6);
+    let cellDate = row.insertCell(1);
+    let cellFileSize = row.insertCell(2);
+    // let cellRemainingDownloads = row.insertCell(2);
+    // let cellStoredUntil = row.insertCell(3);
+    let cellDownloadCount = row.insertCell(3);
+    // let cellUrl = row.insertCell(3);
+    let cellButtons = row.insertCell(4);
 
     cellFilename.innerText = item.Name;
     cellFilename.id = "cell-name-" + item.Id;
-    cellDownloadCount.id = "cell-downloads-" + item.Id;
+    // cellDownloadCount.id = "cell-downloads-" + item.Id;
     cellFileSize.innerText = item.Size;
-    if (item.UnlimitedDownloads) {
-        cellRemainingDownloads.innerText = "Unlimited";
-    } else {
-        cellRemainingDownloads.innerText = item.DownloadsRemaining;
-        cellRemainingDownloads.id = "cell-downloadsRemaining-" + item.Id;
-    }
-    if (item.UnlimitedTime) {
-        cellStoredUntil.innerText = "Unlimited";
-    } else {
-        cellStoredUntil.innerText = formatUnixTimestamp(item.ExpireAt);
-    }
-    cellDownloadCount.innerText = item.DownloadCount;
+    // if (item.UnlimitedDownloads) {
+    //     cellRemainingDownloads.innerText = "Unlimited";
+    // } else {
+    //     cellRemainingDownloads.innerText = item.DownloadsRemaining;
+    //     cellRemainingDownloads.id = "cell-downloadsRemaining-" + item.Id;
+    // }
+    // if (item.UnlimitedTime) {
+    //     cellStoredUntil.innerText = "Unlimited";
+    // } else {
+    //     cellStoredUntil.innerText = formatUnixTimestamp(item.ExpireAt);
+    // }
+    // cellDownloadCount.innerText = item.DownloadCount;
 
-    const link = document.createElement('a');
-    link.href = item.UrlDownload;
-    link.target = '_blank';
-    link.style.color = 'inherit';
-    link.id = 'url-href-' + item.Id;
-    link.textContent = item.Id;
+    // const link = document.createElement('a');
+    // link.href = item.UrlDownload;
+    // link.target = '_blank';
+    // link.style.color = 'inherit';
+    // link.id = 'url-href-' + item.Id;
+    // link.textContent = item.Id;
 
-    cellUrl.appendChild(link);
+    // cellUrl.appendChild(link);
 
-    if (item.IsPasswordProtected === true) {
-        const icon = document.createElement('i');
-        icon.className = 'bi bi-key';
-        icon.title = 'Password protected';
-        cellUrl.appendChild(document.createTextNode(' '));
-        cellUrl.appendChild(icon);
-    }
+    // if (item.IsPasswordProtected === true) {
+    //     const icon = document.createElement('i');
+    //     icon.className = 'bi bi-key';
+    //     icon.title = 'Password protected';
+    //     cellUrl.appendChild(document.createTextNode(' '));
+    //     cellUrl.appendChild(icon);
+    // }
 
     cellButtons.appendChild(createButtonGroup(item));
 
+    cellDate.id = "cell-date-" + item.Id;
+    const YYYY = d.getFullYear()
+    const MM = (d.getMonth() + 1).toString().padStart(2, 0)
+    const DD = (d.getDate()).toString().padStart(2, 0)
+    const hh = (d.getHours()).toString().padStart(2, 0)
+    const mm = (d.getMinutes()).toString().padStart(2, 0)
+    const ss = (d.getSeconds()).toString().padStart(2, 0)
+    cellDate.innerText = `${YYYY}-${MM}-${DD} ${hh}:${mm}:${ss}`;
+    cellDate.classList.add('newItem');
 
     cellFilename.classList.add('newItem');
     cellFileSize.classList.add('newItem');
-    cellRemainingDownloads.classList.add('newItem');
-    cellStoredUntil.classList.add('newItem');
+    // cellRemainingDownloads.classList.add('newItem');
+    // cellStoredUntil.classList.add('newItem');
     cellDownloadCount.classList.add('newItem');
-    cellUrl.classList.add('newItem');
+    // cellUrl.classList.add('newItem');
     cellButtons.classList.add('newItem');
     cellFileSize.setAttribute('data-order', item.SizeBytes);
 
@@ -756,34 +766,26 @@ function createButtonGroup(item) {
 
     group1.appendChild(copyUrlBtn);
 
-    // Dropdown toggle for Hotlink
-    const btnDropdown1 = document.createElement("button");
-    btnDropdown1.type = "button";
-    btnDropdown1.className = "btn btn-outline-light btn-sm dropdown-toggle dropdown-toggle-split";
-    btnDropdown1.setAttribute("data-bs-toggle", "dropdown");
-    btnDropdown1.setAttribute("aria-expanded", "false");
-    group1.appendChild(btnDropdown1);
-
-    const dropdown1 = document.createElement("ul");
-    dropdown1.className = "dropdown-menu dropdown-menu-end";
-    dropdown1.setAttribute("data-bs-theme", "dark");
-
-    const liDr1 = document.createElement("li");
-    const aDr1 = document.createElement("a");
     if (item.UrlHotlink !== "") {
-        aDr1.className = "dropdown-item copyurl";
-        aDr1.title = "Copy hotlink";
-        aDr1.style.cursor = "pointer";
-        aDr1.setAttribute("data-clipboard-text", item.UrlHotlink);
-        aDr1.onclick = () => showToast(1000);
-        aDr1.innerHTML = `<i class="bi bi-copy"></i> Hotlink`;
-    } else {
-        aDr1.className = "dropdown-item";
-        aDr1.innerText = "Hotlink not available";
+        const hotlinkBtn = document.createElement('button');
+        hotlinkBtn.type = 'button';
+        hotlinkBtn.className = 'copyurl btn btn-outline-light btn-sm';
+        hotlinkBtn.id = 'url-button-' + item.Id;
+        hotlinkBtn.title = 'Copy hotlink';
+
+        hotlinkBtn.dataset.clipboardText = item.UrlHotlink;
+
+        const copyIcon = document.createElement('i');
+        copyIcon.className = 'bi bi-copy';
+        hotlinkBtn.appendChild(copyIcon);
+        hotlinkBtn.appendChild(document.createTextNode(' Hotlink'));
+
+        hotlinkBtn.addEventListener('click', () => {
+            showToast(1000);
+        });
+
+        group1.appendChild(hotlinkBtn);
     }
-    liDr1.appendChild(aDr1);
-    dropdown1.appendChild(liDr1);
-    group1.appendChild(dropdown1);
 
     // Share button
     const btnShare = document.createElement("button");
@@ -964,7 +966,7 @@ function handleUndo(button) {
         .then(data => {
             addRow(data.FileInfo);
             if (isE2EEnabled) {
-            	GokapiE2EDecryptMenu();
+                GokapiE2EDecryptMenu();
             }
         })
         .catch(error => {
